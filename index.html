@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game Library</title>
+
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #111;
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .search {
+      width: 90%;
+      margin: 10px auto;
+      display: block;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .card {
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .card p {
+      margin: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🎮 My Game Library</h1>
+
+<input class="search" id="search" placeholder="Search games...">
+
+<div class="grid" id="games"></div>
+
+<script>
+const API_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+let allGames = [];
+
+fetch(API_URL)
+  .then(res => res.json())
+  .then(data => {
+    allGames = data;
+    renderGames(data);
+  });
+
+function renderGames(data) {
+  const container = document.getElementById("games");
+  container.innerHTML = "";
+
+  data.forEach(game => {
+    if (!game.name) return;
+
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <img src="${game.image || ''}">
+      <p>${game.name}</p>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// search filter
+document.getElementById("search").addEventListener("input", (e) => {
+  const value = e.target.value.toLowerCase();
+
+  const filtered = allGames.filter(g =>
+    g.name && g.name.toLowerCase().includes(value)
+  );
+
+  renderGames(filtered);
+});
+
+// register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
